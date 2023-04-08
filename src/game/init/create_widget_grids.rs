@@ -24,6 +24,7 @@ pub fn create_layout_grids(
         &inventory_coords.dimens,
         Vec2::new(inventory_x, inventory_y),
     );
+    /*
     let overseer_width = layout.middle_width();
     let overseer_height = overseer_width * 0.3; // Image is 1000x300.
     let inventory_height = 5.;
@@ -81,7 +82,7 @@ pub fn create_layout_grids(
         .insert(Name::new("Overseer Iris"))
         .insert(Iris)
         .insert(CleanupOnGameplayEnd);
-
+    */
     let x_crafting = layout.right_x() + 0.3333;
     let y_crafting = layout.c_right.crafting_y();
     let crafting_coords = Coords::new(Pos::new(9, 1), Dimens::new(4, 3));

@@ -94,7 +94,7 @@ pub fn check_load_state(
             error!("Failed loading assets!");
         }
         LoadState::Loaded => {
-            commands.insert_resource(NextState(AppState::MainMenu));
+            commands.insert_resource(NextState(AppState::Opening));
         }
         _ => (),
     }

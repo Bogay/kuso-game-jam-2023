@@ -185,5 +185,12 @@ pub fn prepare_loading_config() -> LoadingConfig {
         .insert(FiraSansBold, "FiraSans-Bold.ttf".to_string());
     c.fonts
         .insert(FiraSansItalic, "FiraSans-Italic.ttf".to_string());
+    // ==============================================================
+    // ================= GGJ assets
+    // ==============================================================
+
+    c.textures.insert(Start01, "start1.png".to_string());
+    
+    
     c
 }

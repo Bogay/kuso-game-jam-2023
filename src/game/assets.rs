@@ -223,6 +223,8 @@ pub enum TextureId {
     Axe,
     AxeMasterwork,
     CombineButton,
+    // KGJ start scence
+    Start01
 }
 
 impl Default for TextureId {
