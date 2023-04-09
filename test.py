@@ -67,7 +67,7 @@ while 1:
     print(f'''
         (((1, 1)), (
             id: {id},
-            name: "{id}",
+            name: "{name[id]}",
             description: "{disc[id]}",
-            texture_id: Shield,
+            texture_id: {id},
         )),''',end='')
