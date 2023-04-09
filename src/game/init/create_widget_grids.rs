@@ -140,9 +140,9 @@ pub fn create_layout_combine_button(
                 .insert(CombineButtonText)
                 .insert_bundle(Text2dBundle {
                     text: Text::from_section(
-                        "COMBINE",
+                        "穿越",
                         TextStyle {
-                            font: assets.font(&FontId::FiraSansMedium),
+                            font: assets.font(&FontId::MSBold),
                             font_size: 80.0,
                             color: Color::ANTIQUE_WHITE,
                         },

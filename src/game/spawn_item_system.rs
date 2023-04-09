@@ -37,7 +37,7 @@ pub struct SpawnItemEvent {
     source: Option<Vec2>,
     combine: bool,
     /// Which backpack this item should be put it, default to current backpack in use
-    backpack: Option<usize>,
+    pub backpack: Option<usize>,
 }
 
 #[derive(Debug)]

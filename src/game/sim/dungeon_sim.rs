@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::game::backpack::BackpackInUse;
 use crate::AppState;
 use bevy::prelude::*;
 use iyes_loopless::prelude::NextState;
@@ -52,6 +53,17 @@ pub fn init_dungeon(
     };
     state.current_level = Option::from(generate_level(&mut commands));
     commands.insert_resource(state);
+}
+
+pub fn sync_backpack_in_use(
+    mut er_jump: EventReader<JumpTimepointEvent>,
+    mut backpack_in_use: Query<&mut BackpackInUse>,
+) {
+    for JumpTimepointEvent { to, .. } in er_jump.iter() {
+        for mut b in backpack_in_use.iter_mut() {
+            b.0 = *to;
+        }
+    }
 }
 
 // pub fn progress_dungeon_depth(

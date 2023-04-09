@@ -8,7 +8,10 @@ use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use super::dungeon_components::{TimePointLevel, TimePoint};
+use super::dungeon_components::{TimePoint, TimePointLevel};
+
+const TIMEPOINT_NOW: i32 = 400;
+const TIMEPOINT_ANCIENT: i32 = 0;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LevelBlueprint {
@@ -41,19 +44,23 @@ pub enum RoomType {
 }
 
 fn gen_timepoint(time: i32) -> TimePoint {
-    TimePoint { timepoint: time, flavour: None}
+    TimePoint {
+        timepoint: time,
+        flavour: None,
+    }
 }
 
-pub fn generate_level(
-    mut _cmd: &mut Commands,
-) -> TimePointLevel {
+pub fn generate_level(mut _cmd: &mut Commands) -> TimePointLevel {
     let mut timepoints = Vec::<TimePoint>::new();
-    let mut t = gen_timepoint(400);
+    let t = gen_timepoint(TIMEPOINT_ANCIENT);
     timepoints.push(t);
-    let mut t = gen_timepoint(0);
+    let t = gen_timepoint(TIMEPOINT_NOW);
     timepoints.push(t);
-    
-    TimePointLevel { timenum: 2, timepoints }
+
+    TimePointLevel {
+        timenum: 2,
+        timepoints,
+    }
 }
 
 // pub fn generate_level(
