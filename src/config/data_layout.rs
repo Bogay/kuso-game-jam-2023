@@ -112,6 +112,14 @@ pub struct Container {
     pub height: Option<f32>,
 }
 
+impl Container {
+    pub fn height_with_margin(&self) -> f32 {
+        self.margin_bottom.unwrap_or(0.)
+            + self.height.unwrap_or(0.)
+            + self.margin_bottom.unwrap_or(0.)
+    }
+}
+
 #[derive(Deserialize, Serialize, Default, Debug, Clone)]
 pub struct EquipmentGrid {
     /// The absolute coordinates of the equipment grid. Coordinates of each of the individual slots

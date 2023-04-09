@@ -5,10 +5,11 @@ use iyes_loopless::state::NextState;
 
 use crate::audio::sound_event::SoundEvent;
 use crate::config::data_layout::LayoutData;
-use crate::game::create_backpack::create_layout_background;
+use crate::game::create_widget_backpack::create_layout_background;
 use crate::game::create_widget_feed::create_layout_feed;
 use crate::game::create_widget_grids::{create_layout_combine_button, create_layout_grids};
 use crate::game::create_widget_hero::create_layout_hero;
+use crate::game::create_widget_instruction::create_layout_instruction;
 use crate::game::create_widget_music::create_layout_music;
 use crate::game::create_widget_toasts::create_layout_toasts;
 use crate::game::{create_camera, AlbumId, AssetStorage, FontId, MENU_ZOOM};
@@ -16,7 +17,7 @@ use crate::mouse::MouseInteractive;
 use crate::positioning::Depth;
 use crate::states::delete_all_entities;
 use crate::transition_state::MenuTransition;
-use crate::{AppState, DebugConfig};
+use crate::{AppState, DebugConfig, GAME_NAME};
 
 pub struct MainMenuPlugin;
 
@@ -30,13 +31,14 @@ impl Plugin for MainMenuPlugin {
                     .with_system(delete_all_entities)
                     .with_system(create_camera)
                     .with_system(create_layout_background)
-                    /* 
+                    /*
                     .with_system(create_layout_music)
                     */
                     .with_system(create_layout_feed)
                     .with_system(create_layout_grids)
                     .with_system(create_layout_toasts)
                     .with_system(create_layout_combine_button)
+                    .with_system(create_layout_instruction)
                     //.with_system(create_layout_hero) /* state gui */
                     .with_system(init_menu) /* change this if need to modify background title */
                     //.with_system(play_menu_music.run_if(should_play_music_right_away))
@@ -147,7 +149,7 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
     };
 
     commands.spawn_bundle(Text2dBundle {
-        text: Text::from_section("GG", title_text_style).with_alignment(text_alignment),
+        text: Text::from_section(GAME_NAME, title_text_style).with_alignment(text_alignment),
         transform: Transform::from_translation(Vec3::new(
             screen_anchor.x + menu_screen_dimens.x * 0.2,
             screen_anchor.y + menu_screen_dimens.y * 0.8,
@@ -160,7 +162,6 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
         )),
         ..default()
     });
-
 }
 
 pub fn clean_menu_entities(mut commands: Commands, query: Query<Entity, With<MenuEntity>>) {

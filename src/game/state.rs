@@ -6,7 +6,7 @@ use iyes_loopless::prelude::*;
 
 use crate::audio::record_player::animate;
 use crate::audio::sound_event::SoundEvent;
-use crate::game::dungeon_sim::{init_dungeon, manage_continue_prompt, tick_dungeon};
+use crate::game::dungeon_sim::{init_dungeon, manage_continue_prompt, tick_timepoint};
 use crate::game::event_handling::{
     handle_sim_loot, handle_sim_message, SimLootEvent, SimMessageEvent,
 };
@@ -30,7 +30,8 @@ use super::combat::{Combatant, Enemy, Hero};
 use super::dungeon_sim::{sync_backpack_in_use, JumpTimepointEvent};
 use super::{
     consume_item, delete_item_system, show_item_stack_count, update_health_bar,
-    update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin, WinGamePlugin,
+    update_hero_stats_display, update_label_for_combine_button, EvolutionPlugin, Eyes, Iris,
+    SpawnItemPlugin, WinGamePlugin,
 };
 
 pub struct GamePlugin;
@@ -63,9 +64,8 @@ impl Plugin for GamePlugin {
                 AppState::InGame,
                 ConditionSet::new()
                     .run_in_state(AppState::InGame)
-                    .with_system(start_jazz_music)
                     .with_system(init_dungeon)
-                    .with_system(create_debug_items)
+                    .with_system(create_initial_items)
                     //.with_system(test_slice)
                     .into(),
             )
@@ -81,7 +81,7 @@ impl Plugin for GamePlugin {
                     .with_system(process_drag_event)
                     .with_system(combine_items_system)
                     .with_system(animate)
-                    .with_system(tick_dungeon)
+                    .with_system(tick_timepoint)
                     .with_system(tick_temporary_modifiers)
                     .with_system(test_apply_modifier)
                     .with_system(handle_sim_message)
@@ -99,6 +99,7 @@ impl Plugin for GamePlugin {
                     .with_system(animate_falling_item)
                     .with_system(show_item_stack_count)
                     .with_system(sync_backpack_in_use)
+                    .with_system(update_label_for_combine_button)
                     .into(),
             )
             .add_exit_system_set(
@@ -120,10 +121,6 @@ impl Plugin for GamePlugin {
 pub enum GameResult {
     Lost,
     Won,
-}
-
-fn start_jazz_music(mut audio: EventWriter<SoundEvent>) {
-    audio.send(SoundEvent::PlayAlbum(AlbumId::Jazz));
 }
 
 pub fn despawn_gameplay_entities(
@@ -165,65 +162,19 @@ pub fn eye_tracking_system(
     }
 }
 
-pub fn create_debug_items(mut spawn: EventWriter<SpawnItemEvent>, items_db: Res<ItemsData>) {
-    // let mut item = items_db.try_get_item(ItemId::ScrollBasic7).unwrap();
-    // spawn.send(SpawnItemEvent::without_anim(
-    //     item.1,
-    //     Coords::new(Pos::new(4, 3), item.0),
-    // ));
-    let item = items_db.try_get_item(ItemId::GatheringAndHunting).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(5, 3), item.0),
-    ));
-    let item = items_db.try_get_item(ItemId::Fishery).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(4, 3), item.0),
-    ));
-    let item = items_db.try_get_item(ItemId::StoneTool).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(4, 2), item.0),
-    ));
-    // item = items_db
-    //     .try_get_item(ItemId::MasterworkSwordOfSpeed)
-    //     .unwrap();
-    // spawn.send(SpawnItemEvent::without_anim(
-    //     item.1,
-    //     Coords::new(Pos::new(7, 0), item.0),
-    // ));
-    // item = items_db.try_get_item(ItemId::SwordRusty).unwrap();
-    // spawn.send(SpawnItemEvent::without_anim(
-    //     item.1,
-    //     Coords::new(Pos::new(4, 0), item.0),
-    // ));
-    //
-    // item = items_db.try_get_item(ItemId::SwordRusty).unwrap();
-    // spawn.send(SpawnItemEvent::without_anim(
-    //     item.1,
-    //     Coords::new(Pos::new(5, 0), item.0),
-    // ));
-    //item = items_db.try_get_item(ItemId::ShieldRusty).unwrap();
-    //spawn.send(SpawnItemEvent::without_anim(
-    //    item.1,
-    //    Coords::new(Pos::new(6, 0), item.0),
-    //));
-    //item = items_db.try_get_item(ItemId::Shield).unwrap();
-    //spawn.send(SpawnItemEvent::without_anim(
-    //    item.1,
-    //    Coords::new(Pos::new(0, 2), item.0),
-    //));
-    //item = items_db.try_get_item(ItemId::ArmorRusty).unwrap();
-    //spawn.send(SpawnItemEvent::without_anim(
-    //    item.1,
-    //    Coords::new(Pos::new(2, 2), item.0),
-    //));
-    //item = items_db.try_get_item(ItemId::ArmorRusty).unwrap();
-    //spawn.send(SpawnItemEvent::without_anim(
-    //    item.1,
-    //   Coords::new(Pos::new(4, 2), item.0),
-    //));
+pub fn create_initial_items(mut spawn: EventWriter<SpawnItemEvent>, items_db: Res<ItemsData>) {
+    let spawn_datas = vec![
+        (ItemId::GatheringAndHunting, 5, 3),
+        (ItemId::Fishery, 4, 3),
+        (ItemId::StoneTool, 4, 2),
+    ];
+    for (id, x, y) in spawn_datas {
+        let item = items_db.try_get_item(id).unwrap();
+        spawn.send(SpawnItemEvent::without_anim(
+            item.1,
+            Coords::new(Pos::new(x, y), item.0),
+        ));
+    }
 }
 
 fn test_slice(

@@ -12,6 +12,7 @@ use crate::positioning::{Coords, Dimens, GridData};
 use crate::states::AppState;
 
 use super::backpack::Backpack;
+use super::dungeon_gen::TIMEPOINT_NOW;
 use super::dungeon_sim::{DungeonState, JumpTimepointEvent};
 use super::items::CraftItem;
 
@@ -127,18 +128,14 @@ fn count_by_id<'a>(items: impl IntoIterator<Item = &'a &'a Item>, id: ItemId) ->
 }
 
 fn contains<'a>(items: impl IntoIterator<Item = &'a &'a Item>, id: ItemId) -> bool {
-    items.into_iter().find(|it| it.id == id).is_some()
+    items.into_iter().any(|it| it.id == id)
 }
 
 fn increase_or_unlock(original: usize, add: usize, unlock: bool) -> usize {
     if original > 0 {
         original + add
     } else {
-        if unlock {
-            1
-        } else {
-            0
-        }
+        unlock as usize
     }
 }
 
@@ -152,9 +149,7 @@ where
 {
     let mut v = vec![];
     let get_item = |id: ItemId| {
-        let mut item = items_data.try_get_item(id.clone()).unwrap_or_default().1;
-        // HACK: for testing
-        item.name = id.to_string();
+        let item = items_data.try_get_item(id.clone()).unwrap_or_default().1;
         item
     };
     let tool_points = [
@@ -170,9 +165,10 @@ where
     .next()
     .map(|(_, point)| point)
     .unwrap_or(0);
-    let population = count_by_id(items, ItemId::Wheat) * 100
-        + count_by_id(items, ItemId::Meat) * 120
-        + count_by_id(items, ItemId::Fish) * 150;
+    // TODO: create a Resource for this
+    let population = count_by_id(items, ItemId::Wheat) * 200
+        + count_by_id(items, ItemId::Meat) * 400
+        + count_by_id(items, ItemId::Fish) * 300;
 
     // update wheat
     v.push((
@@ -429,13 +425,11 @@ where
         .collect::<Vec<_>>()
 }
 
-// use events here so this doesn't run once a frame?
+// TODO: use events here so this doesn't run once a frame?
 pub fn combine_items_system(
     mut commands: Commands,
     mut spawn_event_writer: EventWriter<SpawnItemEvent>,
     mut audio: EventWriter<SoundEvent>,
-    recipes_data: Res<RecipesData>,
-    items_data: Res<ItemsData>,
     grid: Res<GridData>,
     combine_button_query: Query<&MouseInteractive, With<CombineButton>>,
     crafting_items_query: Query<(Entity, &Item), With<CraftItem>>,
@@ -514,4 +508,26 @@ pub fn try_get_recipe(data: &RecipesData, items: &Vec<Item>) -> Option<Recipe> {
     }
 
     possible_recipe
+}
+
+pub fn update_label_for_combine_button(
+    state: Res<DungeonState>,
+    combine_button: Query<Entity, With<CombineButton>>,
+    mut button_label: Query<(&Parent, &mut Text)>,
+) {
+    for ent in combine_button.iter() {
+        for (p, mut txt) in button_label.iter_mut() {
+            if combine_button.get(p.get()).is_ok() {
+                if state.current_level.as_ref().unwrap().timepoints
+                    [state.cur_timepoint_idx as usize]
+                    .timepoint
+                    == TIMEPOINT_NOW
+                {
+                    txt.sections[0].value = "穿越回過去".to_string();
+                } else {
+                    txt.sections[0].value = "穿越回現代".to_string();
+                }
+            }
+        }
+    }
 }

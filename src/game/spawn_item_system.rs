@@ -241,6 +241,9 @@ fn stack_item(
     backpack_in_use: Query<&BackpackInUse>,
     grid: Res<GridData>,
 ) {
+    // disable item stack function
+    return;
+
     let default_backpack_id = match backpack_in_use.get_single() {
         Ok(BackpackInUse(backpack_id)) => *backpack_id,
         Err(e) => {

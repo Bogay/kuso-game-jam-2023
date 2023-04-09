@@ -7,8 +7,8 @@ use crate::positioning::Depth;
 
 pub fn create_layout_feed(mut commands: Commands, layout: Res<LayoutData>) {
     let x = layout.left_x();
-    let width = layout.left_width();
     let y = layout.c_left.feed_y();
+    let width = layout.left_width();
     let height = layout.c_left.feed_height(&layout);
     commands
         .spawn_bundle(SpriteBundle {

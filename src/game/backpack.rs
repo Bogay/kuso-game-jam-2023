@@ -3,7 +3,7 @@ use iyes_loopless::prelude::{AppLooplessStateExt, ConditionSet};
 
 use crate::states::AppState;
 
-use super::{create_backpack::create_backpack_data, dungeon_sim::DungeonState, Item};
+use super::{create_widget_backpack::create_backpack_data, dungeon_sim::DungeonState, Item};
 
 pub struct BackpackPlugin;
 
@@ -24,7 +24,7 @@ impl Plugin for BackpackPlugin {
                     .run_in_state(AppState::InGame)
                     .with_system(switch_backpack)
                     .with_system(show_in_backpack_items)
-                    .with_system(to_debug_backpack_switching)
+                    // .with_system(to_debug_backpack_switching)
                     .into(),
             );
     }
@@ -35,7 +35,7 @@ pub struct Backpack(pub usize);
 #[derive(Component)]
 pub struct BackpackInUse(pub usize);
 
-pub struct SwitchBackpackEvent(usize);
+pub struct SwitchBackpackEvent(pub usize);
 
 pub fn to_debug_backpack_switching(
     state: Res<DungeonState>,
