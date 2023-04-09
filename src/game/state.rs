@@ -30,7 +30,7 @@ use super::combat::{Combatant, Enemy, Hero};
 use super::dungeon_sim::{sync_backpack_in_use, JumpTimepointEvent};
 use super::{
     consume_item, delete_item_system, show_item_stack_count, update_health_bar,
-    update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin, WinGamePlugin
+    update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin, WinGamePlugin,
 };
 
 pub struct GamePlugin;
@@ -166,15 +166,25 @@ pub fn eye_tracking_system(
 }
 
 pub fn create_debug_items(mut spawn: EventWriter<SpawnItemEvent>, items_db: Res<ItemsData>) {
-    let mut item = items_db.try_get_item(ItemId::ScrollBasic7).unwrap();
+    // let mut item = items_db.try_get_item(ItemId::ScrollBasic7).unwrap();
+    // spawn.send(SpawnItemEvent::without_anim(
+    //     item.1,
+    //     Coords::new(Pos::new(4, 3), item.0),
+    // ));
+    let item = items_db.try_get_item(ItemId::GatheringAndHunting).unwrap();
+    spawn.send(SpawnItemEvent::without_anim(
+        item.1,
+        Coords::new(Pos::new(5, 3), item.0),
+    ));
+    let item = items_db.try_get_item(ItemId::Fishery).unwrap();
     spawn.send(SpawnItemEvent::without_anim(
         item.1,
         Coords::new(Pos::new(4, 3), item.0),
     ));
-    item = items_db.try_get_item(ItemId::StoneTool).unwrap();
+    let item = items_db.try_get_item(ItemId::StoneTool).unwrap();
     spawn.send(SpawnItemEvent::without_anim(
         item.1,
-        Coords::new(Pos::new(5, 3), item.0),
+        Coords::new(Pos::new(4, 2), item.0),
     ));
     // item = items_db
     //     .try_get_item(ItemId::MasterworkSwordOfSpeed)

@@ -439,7 +439,7 @@ pub fn combine_items_system(
     grid: Res<GridData>,
     combine_button_query: Query<&MouseInteractive, With<CombineButton>>,
     crafting_items_query: Query<(Entity, &Item), With<CraftItem>>,
-    items_query: Query<&Coords, With<Item>>,
+    items_query: Query<(&Coords, &Backpack), With<Item>>,
     mut state: ResMut<DungeonState>,
     mut ew_jump: EventWriter<JumpTimepointEvent>,
 ) {
@@ -448,12 +448,43 @@ pub fn combine_items_system(
             let cur_timepoint_idx = state.cur_timepoint_idx;
             state.cur_timepoint_idx = 1 - cur_timepoint_idx;
             let level = state.current_level.as_ref().unwrap();
-            ew_jump.send(JumpTimepointEvent {
-                from: level.timepoints[cur_timepoint_idx as usize].timepoint as usize,
-                to: level.timepoints[state.cur_timepoint_idx as usize].timepoint as usize,
-            });
-            info!("{}", level.timepoints[state.cur_timepoint_idx as usize]);
+            let from = level.timepoints[cur_timepoint_idx as usize].timepoint as usize;
+            let to = level.timepoints[state.cur_timepoint_idx as usize].timepoint as usize;
+            ew_jump.send(JumpTimepointEvent { from, to });
+
+            // bring items to ancient
+            // TODO: block invalid items
+            // TODO: extract system
+            if to < from {
+                let items_coords = items_query
+                    .iter()
+                    .filter(|(_, backpack)| backpack.0 == to)
+                    .map(|(coords, _)| *coords)
+                    .collect::<Vec<_>>();
+                let mut same_tick_items = vec![];
+                for (ent, item) in crafting_items_query.iter() {
+                    if let Some(free_coords) =
+                        find_free_space(&grid, Dimens::unit(), &items_coords, &same_tick_items)
+                    {
+                        spawn_event_writer.send(SpawnItemEvent::with_backpack(
+                            item.clone(),
+                            free_coords,
+                            grid.center_crafting(),
+                            to,
+                        ));
+                        same_tick_items.push(free_coords);
+                        commands.entity(ent).despawn_recursive();
+                    } else {
+                        error!("Tried to find free space but failed.");
+                    }
+                }
+            }
+
             audio.send(SoundEvent::Sfx(SoundId::CombineAlchemy));
+            info!(
+                "Jump to {}",
+                level.timepoints[state.cur_timepoint_idx as usize]
+            );
         }
     }
 }
