@@ -41,14 +41,14 @@ mod hud;
 mod loading;
 mod main_menu;
 mod mouse;
+mod opening;
 mod positioning;
 mod states;
 mod transition_state;
 mod window_event_handler;
-mod opening;
 
 /// Will be visible to the user as the name of the window and on the menu screen.
-pub const GAME_NAME: &str = "Bag Goblin";
+pub const GAME_NAME: &str = "時光巫師 3";
 
 fn main() {
     App::new().insert_resource(bevy::log::LogSettings {

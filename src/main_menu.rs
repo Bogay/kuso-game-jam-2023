@@ -16,7 +16,7 @@ use crate::mouse::MouseInteractive;
 use crate::positioning::Depth;
 use crate::states::delete_all_entities;
 use crate::transition_state::MenuTransition;
-use crate::{AppState, DebugConfig};
+use crate::{AppState, DebugConfig, GAME_NAME};
 
 pub struct MainMenuPlugin;
 
@@ -147,7 +147,7 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
     };
 
     commands.spawn_bundle(Text2dBundle {
-        text: Text::from_section("GG", title_text_style).with_alignment(text_alignment),
+        text: Text::from_section(GAME_NAME, title_text_style).with_alignment(text_alignment),
         transform: Transform::from_translation(Vec3::new(
             screen_anchor.x + menu_screen_dimens.x * 0.2,
             screen_anchor.y + menu_screen_dimens.y * 0.8,

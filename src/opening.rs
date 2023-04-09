@@ -146,6 +146,7 @@ pub fn opening(
     mut txt: Query<(&mut Text, &Subtitle), With<Subtitle>>,
     mut audio: EventWriter<SoundEvent>,
     assets: Res<AssetStorage>,
+    input: Res<Input<KeyCode>>,
 ) {
     trace!("opening");
 
@@ -183,15 +184,18 @@ pub fn opening(
                     anim.played = true;
                 }
             }
+
             if anim.timer.tick(time.delta()).just_finished() {
                 now_play.0 += 1;
+                break;
             }
         }
+    }
 
-        if now_play.0 > 2 {
-            audio.send(SoundEvent::KillAllMusic);
-            audio.send(SoundEvent::KillAllSoundEffects);
-            commands.insert_resource(NextState(AppState::MainMenu));
-        }
+    let skip = cfg!(debug_assertion) && input.just_pressed(KeyCode::Back);
+    if skip || now_play.0 > 2 {
+        audio.send(SoundEvent::KillAllMusic);
+        audio.send(SoundEvent::KillAllSoundEffects);
+        commands.insert_resource(NextState(AppState::MainMenu));
     }
 }
