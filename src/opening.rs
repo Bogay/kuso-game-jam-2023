@@ -192,7 +192,7 @@ pub fn opening(
         }
     }
 
-    let skip = cfg!(debug_assertion) && input.just_pressed(KeyCode::Back);
+    let skip = cfg!(debug_assertions) && input.just_pressed(KeyCode::Back);
     if skip || now_play.0 > 2 {
         audio.send(SoundEvent::KillAllMusic);
         audio.send(SoundEvent::KillAllSoundEffects);
