@@ -53,8 +53,8 @@ fn wingame(
     let win_conds = [ItemId::Theocracy, ItemId::PermanentMember, ItemId::Empire, ItemId::Totalitarian];
     for win_cond in win_conds {
         if (contains(&now_items, win_cond)) {
-            if victory.current().clone() == GameResult::Won {
-                victory.set(GameResult::Lost).unwrap();
+            if victory.current().clone() == GameResult::Lost {
+                victory.set(GameResult::Won).unwrap();
             }
             info!("Win!");
             cmd.insert_resource(NextState(AppState::GameEnded));

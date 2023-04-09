@@ -170,9 +170,9 @@ where
     .next()
     .map(|(_, point)| point)
     .unwrap_or(0);
-    let population = count_by_id(items, ItemId::Wheat) * 100
-        + count_by_id(items, ItemId::Meat) * 120
-        + count_by_id(items, ItemId::Fish) * 150;
+    let population = count_by_id(items, ItemId::Wheat) * 200
+        + count_by_id(items, ItemId::Meat) * 400
+        + count_by_id(items, ItemId::Fish) * 300;
 
     // update wheat
     v.push((
@@ -316,10 +316,10 @@ where
         increase_or_unlock(
             count_by_id(items, ItemId::Empire),
             0,
-            count_by_id(items, ItemId::Monarchy) > 1
+            (count_by_id(items, ItemId::Monarchy) > 1
                 && count_by_id(items, ItemId::Centralization) > 0
                 && count_by_id(items, ItemId::Book) > 0
-                && population > 2000,
+                && population > 2000) || population == 500,
         ),
     ));
     v.push((
