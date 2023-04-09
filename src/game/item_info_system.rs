@@ -77,7 +77,7 @@ pub fn update_mouse_over_item_info_system(
                             text: Text::from_section(
                                 &item.name,
                                 TextStyle {
-                                    font: assets.font(&FontId::FiraSansBold),
+                                    font: assets.font(&FontId::MSBold),
                                     font_size: 80.0,
                                     color: Color::ANTIQUE_WHITE,
                                 },
@@ -106,7 +106,7 @@ pub fn update_mouse_over_item_info_system(
                             text: Text::from_section(
                                 &item.description,
                                 TextStyle {
-                                    font: assets.font(&FontId::FiraSansItalic),
+                                    font: assets.font(&FontId::MSBold),
                                     font_size: 60.0,
                                     color: Color::ANTIQUE_WHITE,
                                 },
@@ -141,7 +141,7 @@ pub fn update_mouse_over_item_info_system(
                                 text: Text::from_section(
                                     &slot_name,
                                     TextStyle {
-                                        font: assets.font(&FontId::FiraSansMedium),
+                                        font: assets.font(&FontId::MSBold),
                                         font_size: 60.0,
                                         color: Color::ANTIQUE_WHITE,
                                     },
@@ -212,7 +212,7 @@ pub fn update_mouse_over_item_info_system(
                                 text: Text::from_section(
                                     stat_bonus,
                                     TextStyle {
-                                        font: assets.font(&FontId::FiraSansMedium),
+                                        font: assets.font(&FontId::MSBold),
                                         font_size: 60.0,
                                         color: Color::ANTIQUE_WHITE,
                                     },

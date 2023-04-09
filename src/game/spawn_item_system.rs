@@ -157,7 +157,7 @@ pub fn spawn_item(
             .insert(Backpack(backpack_id))
             // create child to render stack count
             .with_children(|parent| {
-                let font = &crate::game::FontId::FiraSansRegular;
+                let font = &crate::game::FontId::MSBold;
                 let text_style = TextStyle {
                     font: assets.font(font),
                     font_size: 60.0,
