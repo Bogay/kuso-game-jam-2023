@@ -31,7 +31,7 @@ use super::create_backpack::create_backpack_data;
 use super::dungeon_sim::JumpTimepointEvent;
 use super::{
     consume_item, delete_item_system, update_health_bar, update_hero_stats_display, EvolutionEvent,
-    EvolutionPlugin, Eyes, Iris,
+    EvolutionPlugin, Eyes, Iris, SpawnItemPlugin,
 };
 
 pub struct GamePlugin;
@@ -109,7 +109,8 @@ impl Plugin for GamePlugin {
                     .into(),
             )
             .add_plugin(BackpackPlugin)
-            .add_plugin(EvolutionPlugin);
+            .add_plugin(EvolutionPlugin)
+            .add_plugin(SpawnItemPlugin);
     }
 }
 

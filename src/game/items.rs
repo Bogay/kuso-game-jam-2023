@@ -189,6 +189,10 @@ pub struct EquippedItem {
     pub stat_bonus: StatBonus,
 }
 
+/// Store how many items stacked in one grid.
+#[derive(Component)]
+pub struct ItemStack(pub usize);
+
 pub fn consume_item(
     mut commands: Commands,
     mut hero: ResMut<Hero>,

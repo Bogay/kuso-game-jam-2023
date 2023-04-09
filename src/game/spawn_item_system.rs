@@ -1,12 +1,28 @@
 use bevy::prelude::*;
+use iyes_loopless::prelude::ConditionSet;
 
 use super::backpack::BackpackInUse;
+use super::ItemStack;
 use crate::game::backpack::Backpack;
 use crate::game::items::Item;
 use crate::game::{AssetStorage, CleanupOnGameplayEnd, FallingItem, Silhouette};
 use crate::mouse::MouseInteractive;
 use crate::positioning::{Coords, GridData};
 use crate::positioning::{Depth, Dimens, Pos};
+use crate::states::AppState;
+
+pub struct SpawnItemPlugin;
+
+impl Plugin for SpawnItemPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_event::<StackItemEvent>().add_system_set(
+            ConditionSet::new()
+                .run_in_state(AppState::InGame)
+                .with_system(stack_item)
+                .into(),
+        );
+    }
+}
 
 /// Broadcast this as an event to spawn an item.
 #[derive(Debug)]
@@ -19,9 +35,19 @@ pub struct SpawnItemEvent {
     /// in the inventory without any animations.
     source: Option<Vec2>,
     combine: bool,
+    /// Which backpack this item should be put it, default to current backpack in use
     backpack: Option<usize>,
 }
 
+#[derive(Debug)]
+pub struct StackItemEvent {
+    pub item: Item,
+    pub count: usize,
+    /// Which backpack this item should be put it, default to current backpack in use
+    pub backpack: Option<usize>,
+}
+
+// TODO: impl builder to simplify construction process
 impl SpawnItemEvent {
     pub fn new(item: Item, coords: Coords, source: Vec2, combine: bool) -> Self {
         SpawnItemEvent {
@@ -187,4 +213,60 @@ where
         }
     }
     None
+}
+
+fn stack_item(
+    mut commands: Commands,
+    mut events: EventReader<StackItemEvent>,
+    mut ew_spanw_item: EventWriter<SpawnItemEvent>,
+    mut items_query: Query<(Entity, &Item, &Backpack, &Coords, Option<&mut ItemStack>)>,
+    backpack_in_use: Query<&BackpackInUse>,
+    grid: Res<GridData>,
+) {
+    let default_backpack_id = match backpack_in_use.get_single() {
+        Ok(BackpackInUse(backpack_id)) => *backpack_id,
+        Err(e) => {
+            error!(
+                "There should be only one BadInUse component in game.\n{}",
+                e
+            );
+            return;
+        }
+    };
+
+    let mut new_coords_this_round: Vec<(usize, Coords)> = vec![];
+    for evt in events.iter() {
+        debug!("Received {:?}", evt);
+        let StackItemEvent {
+            item,
+            count,
+            backpack,
+        } = evt;
+        let backpack_id = backpack.unwrap_or(default_backpack_id);
+        if let Some((ent, _, _, _, item_stack)) = items_query
+            .iter_mut()
+            // search item in target backpack
+            .find(|(_, c_item, backpack, _, _)| backpack.0 == backpack_id && c_item.id == item.id)
+        {
+            if let Some(mut item_stack) = item_stack {
+                item_stack.0 += count;
+            } else {
+                commands.entity(ent).insert(ItemStack(*count));
+            }
+        } else {
+            let new_coords_in_backpack = new_coords_this_round
+                .iter()
+                .filter_map(|(c, it)| (*c == backpack_id).then(|| it.clone()));
+            let curr_coords = items_query
+                .iter()
+                .filter(|(_, _, backpack, _, _)| backpack.0 == backpack_id)
+                .map(|(_, _, _, coords, _)| *coords)
+                .chain(new_coords_in_backpack)
+                .collect::<Vec<_>>();
+            let coords = find_free_space(&grid, Dimens::unit(), &vec![], &curr_coords)
+                .expect("should find a free space");
+            ew_spanw_item.send(SpawnItemEvent::without_anim(item.clone(), coords));
+            new_coords_this_round.push((backpack_id, coords));
+        }
+    }
 }
