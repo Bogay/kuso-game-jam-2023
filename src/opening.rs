@@ -177,7 +177,7 @@ pub fn opening(
     mut audio: EventWriter<SoundEvent>,
     assets: Res<AssetStorage>,
 ){
-    info!("start render");
+    debug!("start render");
     let (mut txt, subtitle) = txt.single_mut();
 
     //start0

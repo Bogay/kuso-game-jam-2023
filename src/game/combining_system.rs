@@ -12,7 +12,7 @@ use crate::positioning::{Coords, Dimens, GridData};
 use crate::states::AppState;
 
 use super::backpack::Backpack;
-use super::dungeon_sim::JumpTimepointEvent;
+use super::dungeon_sim::{DungeonState, JumpTimepointEvent};
 use super::items::CraftItem;
 
 #[derive(Component)]
@@ -54,7 +54,7 @@ fn evolution_after_jumped_timepoint(
 fn evolution(
     mut evolution: EventReader<EvolutionEvent>,
     mut commands: Commands,
-    items: Query<(Entity, &Item, &Backpack, &Coords)>,
+    items: Query<(Entity, &Item, &Backpack, &Coords, Option<&CraftItem>)>,
     items_data: Res<ItemsData>,
     grid: Res<GridData>,
     mut spawn_event_writer: EventWriter<SpawnItemEvent>,
@@ -62,16 +62,29 @@ fn evolution(
     for &EvolutionEvent { from, to } in evolution.iter() {
         debug!("evolution from {}, to {}", from, to);
 
-        for (ent, _, _, _) in items.iter().filter(|(_, _, backpack, _)| backpack.0 == to) {
+        for (ent, _, _, _, _) in items
+            .iter()
+            .filter(|(_, _, backpack, _, _)| backpack.0 == to)
+        {
             commands.entity(ent).despawn();
         }
 
-        let from_items = items
+        let from_coords = items
             .iter()
-            .filter(|(_, _, backpack, _)| backpack.0 == from)
-            .map(|(_, item, _, _)| item)
+            .filter(|(_, _, backpack, _, craft)| backpack.0 == from && craft.is_none())
+            .map(|(_, _, _, coords, _)| *coords)
             .collect::<Vec<_>>();
-        let new_items = calculate_items_after_evolution(&from_items, &items_data);
+        let craft_items = items
+            .iter()
+            .filter(|(_, _, backpack, _, craft)| backpack.0 == from && craft.is_some())
+            .map(|(ent, item, _, _, _)| (ent, item))
+            .collect::<Vec<_>>();
+        // items should contribute in evolution process
+        let items_in_evo = craft_items
+            .iter()
+            .map(|(_, item)| *item)
+            .collect::<Vec<_>>();
+        let new_items = calculate_items_after_evolution(&items_in_evo, &items_data);
         let mut same_tick_items = vec![];
         let items_coords = vec![];
         for (item, cnt) in new_items.into_iter() {
@@ -89,6 +102,21 @@ fn evolution(
                 } else {
                     error!("Tried to find free space but failed.");
                 }
+            }
+        }
+
+        let mut same_tick_items = vec![];
+        for (ent, item) in craft_items {
+            if let Some(free_coords) =
+                find_free_space(&grid, Dimens::unit(), &from_coords, &same_tick_items)
+            {
+                let mut evt = SpawnItemEvent::without_anim(item.clone(), free_coords);
+                evt.backpack = Some(from);
+                spawn_event_writer.send(evt);
+                same_tick_items.push(free_coords);
+                commands.entity(ent).despawn_recursive();
+            } else {
+                error!("Tried to find free space but failed.");
             }
         }
     }
@@ -412,50 +440,20 @@ pub fn combine_items_system(
     combine_button_query: Query<&MouseInteractive, With<CombineButton>>,
     crafting_items_query: Query<(Entity, &Item), With<CraftItem>>,
     items_query: Query<&Coords, With<Item>>,
+    mut state: ResMut<DungeonState>,
+    mut ew_jump: EventWriter<JumpTimepointEvent>,
 ) {
     if let Ok(combine_button) = combine_button_query.get_single() {
         if combine_button.clicked {
-            let number_of_crafting_items = crafting_items_query.iter().count();
-            if number_of_crafting_items <= 1 {
-                return;
-            }
-
-            let mut items = Vec::new();
-            for (_, item) in crafting_items_query.iter() {
-                items.push(item.clone());
-            }
-
-            let possible_recipe = try_get_recipe(&recipes_data, &items);
-            trace!("found possible recipe: {:?}", possible_recipe);
-
-            if let Some(recipe) = possible_recipe {
-                // debug!("found recipe: {:?}", recipe);
-                if let Some((dimens, item)) = items_data.try_get_item(recipe.result) {
-                    // debug!("got random item: {:?}", item);
-
-                    if let Some(free_coords) = find_free_space(&grid, dimens, &items_query, &[]) {
-                        // ^ this is failing
-                        debug!("found free space to place the item");
-                        // Spawn the result of the recipe
-                        spawn_event_writer.send(SpawnItemEvent::new(
-                            item,
-                            free_coords,
-                            grid.center_crafting(),
-                            true,
-                        ));
-                        // Delete the craft items entities
-                        for (entity, _) in crafting_items_query.iter() {
-                            commands.entity(entity).despawn_recursive();
-                        }
-                        // Alchemy sound not working or extremely low volume?
-                        audio.send(SoundEvent::Sfx(SoundId::CombineAlchemy))
-                    } else {
-                        warn!("Tried to find free space but failed.");
-                    }
-                }
-            } else {
-                audio.send(SoundEvent::Sfx(SoundId::CombineCant))
-            }
+            let cur_timepoint_idx = state.cur_timepoint_idx;
+            state.cur_timepoint_idx = 1 - cur_timepoint_idx;
+            let level = state.current_level.as_ref().unwrap();
+            ew_jump.send(JumpTimepointEvent {
+                from: level.timepoints[cur_timepoint_idx as usize].timepoint as usize,
+                to: level.timepoints[state.cur_timepoint_idx as usize].timepoint as usize,
+            });
+            info!("{}", level.timepoints[state.cur_timepoint_idx as usize]);
+            audio.send(SoundEvent::Sfx(SoundId::CombineAlchemy));
         }
     }
 }

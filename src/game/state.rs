@@ -27,7 +27,7 @@ use crate::AppState;
 
 use super::backpack::BackpackPlugin;
 use super::combat::{Combatant, Enemy, Hero};
-use super::dungeon_sim::JumpTimepointEvent;
+use super::dungeon_sim::{sync_backpack_in_use, JumpTimepointEvent};
 use super::{
     consume_item, delete_item_system, show_item_stack_count, update_health_bar,
     update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin, WinGamePlugin
@@ -98,6 +98,7 @@ impl Plugin for GamePlugin {
                     .with_system(delete_item_system)
                     .with_system(animate_falling_item)
                     .with_system(show_item_stack_count)
+                    .with_system(sync_backpack_in_use)
                     .into(),
             )
             .add_exit_system_set(
