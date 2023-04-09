@@ -7,6 +7,8 @@ use crate::positioning::Depth;
 use crate::positioning::Pos;
 use crate::positioning::{Coords, GridData};
 
+use super::StackItemEvent;
+
 /// Broadcast this event when completing a dragging operation.
 /// The entity that is being dragged still has the BeingDragged component.
 /// The Pos is the target position that the item is moved towards.
@@ -94,13 +96,19 @@ pub fn set_ghost_position(
 pub fn check_ghost_placement_validity(
     grid: Res<GridData>,
     mut query_ghost: Query<(&mut DragGhost, &mut Sprite, &Coords)>,
-    query_items: Query<&Coords, (With<Item>, Without<BeingDragged>)>,
+    query_items: Query<(&Coords, &Item), Without<BeingDragged>>,
+    mut being_dragged: Query<&Item, With<BeingDragged>>,
 ) {
+    let is_inside_grid = |coords| grid.inventory.encloses(coords) || grid.crafting.encloses(coords);
     if let Ok((mut ghost, mut sprite, coords)) = query_ghost.get_single_mut() {
-        let conflicts_with_item = query_items.iter().any(|item| coords.overlaps(item));
-        if !conflicts_with_item
-            && (grid.inventory.encloses(coords) || grid.crafting.encloses(coords))
-        {
+        let Ok(dragged_item) = being_dragged.get_single_mut() else { 
+            error!("there should be only 1 BeingDragged");
+            return;
+        };
+        let conflicted_item = query_items
+            .iter()
+            .find_map(|(icoords, item)| (coords.overlaps(icoords) && dragged_item.id != item.id).then_some(item));
+        if is_inside_grid(coords) && !conflicted_item.is_some() {
             ghost.placement_valid = true;
             sprite.color = Color::rgba(1., 1., 1., 0.5);
         } else {
@@ -133,10 +141,12 @@ pub fn process_drag_event(
     grid: Res<GridData>,
     mut events: EventReader<DragEvent>,
     query_ghost: Query<(Entity, &DragGhost)>,
-    mut query_item: Query<(Entity, &mut Transform, &mut Coords), With<BeingDragged>>,
+    mut query_item: Query<(Entity, &mut Transform, &mut Coords, &Item), With<BeingDragged>>,
+    query_other_items: Query<(&Coords, &Item), Without<BeingDragged>>,
+    mut ew_stack_item: EventWriter<StackItemEvent>,
 ) {
     for DragEvent(end) in events.iter() {
-        if let Ok((entity, mut transform, mut coords)) = query_item.get_single_mut() {
+        if let Ok((entity, mut transform, mut coords, dragged_item)) = query_item.get_single_mut() {
             let (ghost_entity, ghost) = query_ghost.single();
             commands.entity(ghost_entity).despawn_recursive();
             commands.entity(entity).remove::<BeingDragged>();
@@ -145,10 +155,23 @@ pub fn process_drag_event(
                 coords.pos = *end;
                 transform.translation.x = grid.calc_x(&coords);
                 transform.translation.y = grid.calc_y(&coords);
+
                 if grid.crafting.encloses(&coords) {
                     commands.entity(entity).insert(CraftItem);
                 } else if grid.inventory.encloses(&coords) {
                     commands.entity(entity).remove::<CraftItem>();
+
+                    let stackable = query_other_items.iter().any(
+                    |(coords, item)| end == &coords.pos && dragged_item.id == item.id);
+                    if stackable {
+                        // remove item being dragged and stack it
+                        commands.entity(entity).despawn();
+                        ew_stack_item.send(StackItemEvent {
+                            item : dragged_item.clone(),
+                            count: 1,
+                            backpack: None,
+                        });
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ use crate::transition_state::MenuTransition;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub enum AppState {
     Loading,
+    Opening,
     MainMenu,
     /// Transitioning between MainMenu and InGame.
     Transition,

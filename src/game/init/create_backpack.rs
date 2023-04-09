@@ -14,6 +14,9 @@ pub fn create_layout_background(
 ) {
     let center = layout.screen_dimens * 0.5;
     let menu_size = MENU_ZOOM * layout.screen_dimens;
+    let size = 1.2 * layout.screen_dimens.x.max(layout.screen_dimens.y);
+    let pos_x = 0.5 * layout.screen_dimens.x;
+    /*
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
@@ -26,8 +29,6 @@ pub fn create_layout_background(
         })
         .insert(CleanupOnGameplayEnd);
 
-    let size = 1.2 * layout.screen_dimens.x.max(layout.screen_dimens.y);
-    let pos_x = 0.5 * layout.screen_dimens.x;
     // Create the background backpack that will be visible during the game.
     // During the game, not much of this image is visible. But during the transition,
     // this really sells the illusion that you're entering the backpack.
@@ -43,6 +44,7 @@ pub fn create_layout_background(
             ..default()
         })
         .insert(CleanupOnGameplayEnd);
+     */
     // Create the clickable menu backpack.
     commands
         .spawn_bundle(SpriteSheetBundle {

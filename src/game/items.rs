@@ -196,6 +196,10 @@ pub struct EquippedItem {
     pub stat_bonus: StatBonus,
 }
 
+/// Store how many items stacked in one grid.
+#[derive(Component)]
+pub struct ItemStack(pub usize);
+
 pub fn consume_item(
     mut commands: Commands,
     mut hero: ResMut<Hero>,
@@ -283,5 +287,18 @@ pub fn apply_silhouette(mut query: Query<(&mut Sprite, Option<&Silhouette>), Wit
         } else {
             Color::rgb(1., 1., 1.)
         };
+    }
+}
+
+pub fn show_item_stack_count(
+    items_query: Query<(&Item, Option<&ItemStack>)>,
+    mut text_query: Query<(&Parent, &mut Text, &mut Visibility)>,
+) {
+    for (p, mut txt, mut vis) in text_query.iter_mut() {
+        if let Ok((_, it_stk)) = items_query.get(p.get()) {
+            let it_stk = it_stk.map(|ItemStack(x)| x).unwrap_or(&0);
+            vis.is_visible = *it_stk > 1;
+            txt.sections[0].value = it_stk.to_string();
+        }
     }
 }
