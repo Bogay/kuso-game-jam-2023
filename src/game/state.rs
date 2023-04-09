@@ -30,7 +30,7 @@ use super::combat::{Combatant, Enemy, Hero};
 use super::dungeon_sim::JumpTimepointEvent;
 use super::{
     consume_item, delete_item_system, show_item_stack_count, update_health_bar,
-    update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin,
+    update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin, WinGamePlugin
 };
 
 pub struct GamePlugin;
@@ -110,6 +110,7 @@ impl Plugin for GamePlugin {
             )
             .add_plugin(BackpackPlugin)
             .add_plugin(EvolutionPlugin)
+            .add_plugin(WinGamePlugin);
             .add_plugin(SpawnItemPlugin);
     }
 }

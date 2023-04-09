@@ -29,6 +29,7 @@ pub struct DungeonState {
     pub msg_cooldown: Timer,
     pub running: bool,
     pub combat_state: CombatState,
+    pub round: i32,
 }
 
 #[derive(Component)]
@@ -47,6 +48,7 @@ pub fn init_dungeon(
         msg_cooldown: Timer::new(Duration::from_millis(params.duration_millis), true),
         running: true,
         combat_state: CombatState::Init,
+        round: 0,
     };
     state.current_level = Option::from(generate_level(&mut commands));
     commands.insert_resource(state);
@@ -101,6 +103,9 @@ pub fn tick_dungeon(
         if just_resumed {
             state.msg_cooldown.reset();
         }
+        if (state.cur_timepoint_idx == 0) {
+            state.round += 1;
+        }
         let cur_timepoint_idx = state.cur_timepoint_idx;
         state.cur_timepoint_idx = 1 - cur_timepoint_idx;
         let level = state.current_level.as_ref().unwrap();
@@ -108,8 +113,21 @@ pub fn tick_dungeon(
             from: level.timepoints[cur_timepoint_idx as usize].timepoint as usize,
             to: level.timepoints[state.cur_timepoint_idx as usize].timepoint as usize,
         });
+
+        if (state.round > 10)
+        {
+            if victory.current().clone() == GameResult::Won {
+                victory.set(GameResult::Lost).unwrap();
+            }
+            info!("Dungeon complete!");
+            cmd.insert_resource(NextState(AppState::GameEnded));
+            halt_dungeon_sim(state);
+            return;
+        }
+
         info!("{}", level.timepoints[state.cur_timepoint_idx as usize]);
         halt_dungeon_sim(state);
+
     }
 }
 

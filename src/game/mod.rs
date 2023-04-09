@@ -10,6 +10,7 @@ pub use self::recipes::*;
 pub use self::sim::*;
 pub use self::spawn_item_system::*;
 pub use self::state::*;
+pub use wingame_system::WinGamePlugin;
 
 pub mod assets;
 pub mod backpack;
@@ -26,3 +27,4 @@ pub mod sim;
 pub mod spawn_item_system;
 pub mod state;
 pub mod timed_effect;
+pub mod wingame_system;
