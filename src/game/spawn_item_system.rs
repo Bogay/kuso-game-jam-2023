@@ -3,6 +3,7 @@ use iyes_loopless::prelude::ConditionSet;
 
 use super::backpack::BackpackInUse;
 use super::ItemStack;
+use crate::config::data_layout::LayoutData;
 use crate::game::backpack::Backpack;
 use crate::game::items::Item;
 use crate::game::{AssetStorage, CleanupOnGameplayEnd, FallingItem, Silhouette};
@@ -86,6 +87,7 @@ pub fn spawn_item(
     backpack_in_use: Query<&BackpackInUse>,
     assets: Res<AssetStorage>,
     grid: Res<GridData>,
+    layout: Res<LayoutData>,
 ) {
     let default_backpack_id = match backpack_in_use.get_single() {
         Ok(BackpackInUse(backpack_id)) => *backpack_id,
@@ -152,7 +154,23 @@ pub fn spawn_item(
             .insert(*coords)
             .insert(MouseInteractive::new(coords.dimens.as_vec2(), true))
             .insert(CleanupOnGameplayEnd)
-            .insert(Backpack(backpack_id));
+            .insert(Backpack(backpack_id))
+            // create child to render stack count
+            .with_children(|parent| {
+                let font = &crate::game::FontId::FiraSansRegular;
+                let text_style = TextStyle {
+                    font: assets.font(font),
+                    font_size: 60.0,
+                    color: Color::WHITE,
+                };
+                parent.spawn_bundle(Text2dBundle {
+                    text: Text::from_section("NULL", text_style),
+                    transform: Transform::from_translation(Vec3::new(0., 0., 1.0)).with_scale(
+                        Vec3::new(1. / layout.text_factor, 1. / layout.text_factor, 1.),
+                    ),
+                    ..Default::default()
+                });
+            });
         if source.is_some() {
             builder.insert(Silhouette);
         }
@@ -251,7 +269,7 @@ fn stack_item(
             if let Some(mut item_stack) = item_stack {
                 item_stack.0 += count;
             } else {
-                commands.entity(ent).insert(ItemStack(*count));
+                commands.entity(ent).insert(ItemStack(*count + 1));
             }
         } else {
             let new_coords_in_backpack = new_coords_this_round
