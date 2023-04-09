@@ -10,8 +10,8 @@ use std::collections::HashMap;
 
 use super::dungeon_components::{TimePoint, TimePointLevel};
 
-const TIMEPOINT_NOW: i32 = 400;
-const TIMEPOINT_ANCIENT: i32 = 0;
+pub const TIMEPOINT_NOW: i32 = 400;
+pub const TIMEPOINT_ANCIENT: i32 = 0;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LevelBlueprint {
@@ -58,6 +58,7 @@ pub fn generate_level(mut _cmd: &mut Commands) -> TimePointLevel {
     timepoints.push(t);
 
     TimePointLevel {
+        // TODO: does this always == timepoints.len()?
         timenum: 2,
         timepoints,
     }
