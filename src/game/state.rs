@@ -6,7 +6,7 @@ use iyes_loopless::prelude::*;
 
 use crate::audio::record_player::animate;
 use crate::audio::sound_event::SoundEvent;
-use crate::game::dungeon_sim::{init_dungeon, manage_continue_prompt, tick_dungeon};
+use crate::game::dungeon_sim::{init_dungeon, manage_continue_prompt, tick_timepoint};
 use crate::game::event_handling::{
     handle_sim_loot, handle_sim_message, SimLootEvent, SimMessageEvent,
 };
@@ -81,7 +81,7 @@ impl Plugin for GamePlugin {
                     .with_system(process_drag_event)
                     .with_system(combine_items_system)
                     .with_system(animate)
-                    .with_system(tick_dungeon)
+                    .with_system(tick_timepoint)
                     .with_system(tick_temporary_modifiers)
                     .with_system(test_apply_modifier)
                     .with_system(handle_sim_message)
