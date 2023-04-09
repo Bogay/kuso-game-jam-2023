@@ -1,117 +1,91 @@
-use std::time::Duration;
-
-use bevy::ecs::system::Resource;
+use crate::audio::sound_event::SoundEvent;
+use crate::config::data_layout::LayoutData;
+use crate::game::assets::{AlbumId, FontId, SoundId};
+use crate::game::{AssetStorage, CleanupOnGameplayEnd, TextureId};
+use crate::positioning::Depth;
+use crate::AppState;
 use bevy::prelude::*;
 use iyes_loopless::prelude::{AppLooplessStateExt, ConditionSet};
 use iyes_loopless::state::NextState;
 
-use crate::audio::sound_event::SoundEvent;
-use crate::config::data_layout::LayoutData;
-use crate::game::assets::{SoundId, FontId, AlbumId};
-use crate::game::{AssetStorage, TextureId, assets, CleanupOnGameplayEnd, MENU_ZOOM};
-use crate::AppState;
-use crate::positioning::Depth;
-
 pub struct OpeningPlugin;
 
 #[derive(Component)]
-pub struct StartEntity01 {
-    timer: Timer,
-    played: bool
-}
+pub struct PlayingOpening(pub usize);
+
 #[derive(Component)]
-pub struct StartEntity02 {
+pub struct OpeningAnimation {
     timer: Timer,
-    played: bool
+    played: bool,
+    index: usize,
 }
-#[derive(Component)]
-pub struct StartEntity03 {
-    timer: Timer,
-    played: bool
-}
+
 #[derive(Component)]
 pub struct Subtitle {
     title_text_style: TextStyle,
-    text_alignment: TextAlignment
+    text_alignment: TextAlignment,
 }
 
 impl Plugin for OpeningPlugin {
     fn build(&self, app: &mut App) {
         app.add_enter_system_set(
-                AppState::Opening,
-                ConditionSet::new()
-                    .run_in_state(AppState::Opening)
-                    .with_system(init_opening)
-                    .into(),
-            )
-            .add_system_set(
-                ConditionSet::new()
-                    .run_in_state(AppState::Opening)
-                    .with_system(opening)
-                    .into(),
-            );
+            AppState::Opening,
+            ConditionSet::new()
+                .run_in_state(AppState::Opening)
+                .with_system(init_opening)
+                .into(),
+        )
+        .add_system_set(
+            ConditionSet::new()
+                .run_in_state(AppState::Opening)
+                .with_system(opening)
+                .into(),
+        );
     }
 }
-pub fn init_opening(
-    mut commands: Commands,
-    assets: Res<AssetStorage>,
-    layout: Res<LayoutData>
-) {
-    info!("add animation assets");
+
+pub fn init_opening(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<LayoutData>) {
+    info!("Add animation assets");
+    commands.spawn().insert(PlayingOpening(0));
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                ..default()
-            },
             texture: assets.texture(&TextureId::Start01),
             transform: Transform::from_xyz(0.0, 0.0, Depth::Background.z()),
-            visibility: Visibility {
-                is_visible: true,
-            },
             ..default()
         })
         .insert(CleanupOnGameplayEnd)
-        .insert(StartEntity01 {
-            timer: Timer::new(Duration::from_secs(5), true),
-            played: false
+        .insert(OpeningAnimation {
+            timer: Timer::from_seconds(5., false),
+            played: false,
+            index: 0,
         });
-
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                ..default()
-            },
             texture: assets.texture(&TextureId::Start02),
             transform: Transform::from_xyz(0.0, 0.0, Depth::Background.z()),
-            visibility: Visibility {
-                is_visible: false,
-            },
+            visibility: Visibility { is_visible: false },
             ..default()
         })
         .insert(CleanupOnGameplayEnd)
-        .insert(StartEntity02 {
-            timer: Timer::new(Duration::from_secs(5), false),
-            played: false
+        .insert(OpeningAnimation {
+            timer: Timer::from_seconds(5., false),
+            played: false,
+            index: 1,
         });
-
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite {
-                ..default()
-            },
             texture: assets.texture(&TextureId::Start03),
             transform: Transform::from_xyz(0.0, 0.0, Depth::Background.z()),
-            visibility: Visibility {
-                is_visible: false,
-            },
+            visibility: Visibility { is_visible: false },
             ..default()
         })
         .insert(CleanupOnGameplayEnd)
-        .insert(StartEntity03 {
-            timer: Timer::new(Duration::from_secs(5), false),
-            played: false
+        .insert(OpeningAnimation {
+            timer: Timer::from_seconds(5., false),
+            played: false,
+            index: 2,
         });
-    
+
     let menu_screen_dimens = layout.screen_dimens;
     let screen_center = layout.screen_dimens * 0.5;
     let screen_anchor = screen_center - menu_screen_dimens * 0.5;
@@ -124,122 +98,100 @@ pub fn init_opening(
         horizontal: HorizontalAlign::Center,
         vertical: VerticalAlign::Bottom,
     };
-    commands.spawn_bundle(Text2dBundle {
-            text: Text::from_section("測試", title_text_style.clone()).with_alignment(text_alignment),
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text::from_section("測試", title_text_style.clone())
+                .with_alignment(text_alignment),
             transform: Transform::from_translation(Vec3::new(
-                screen_anchor.x, 
+                screen_anchor.x,
                 screen_anchor.y - menu_screen_dimens.y * 25.,
                 Depth::Menu.z() + 10.,
             ))
-            .with_scale(Vec3::new(
-                1.,
-                1.,
-                1.,
-            )),
+            .with_scale(Vec3::ONE),
             ..default()
-        }).insert(Subtitle {
+        })
+        .insert(Subtitle {
             title_text_style: title_text_style,
-            text_alignment: text_alignment
+            text_alignment: text_alignment,
         });
-    
 }
 
-pub fn change_txt(
-    txt: &mut Text,
-    subtitle: &Subtitle,
-    target:String
-){
-    *txt = Text::from_section(target, subtitle.title_text_style.clone()).with_alignment(subtitle.text_alignment)
+pub fn change_txt(txt: &mut Text, subtitle: &Subtitle, target: String) {
+    *txt = Text::from_section(target, subtitle.title_text_style.clone())
+        .with_alignment(subtitle.text_alignment)
 }
 
 pub fn change_white_txt(
     txt: &mut Text,
     subtitle: &Subtitle,
-    target:String,
-    assets: Res<AssetStorage>,
-){
-    *txt = Text::from_section(target, TextStyle {
-        font: assets.font(&FontId::MSBold),
-        font_size: 64.0,
-        color: Color::WHITE,
-    }).with_alignment(subtitle.text_alignment)
+    target: String,
+    assets: &AssetStorage,
+) {
+    *txt = Text::from_section(
+        target,
+        TextStyle {
+            font: assets.font(&FontId::MSBold),
+            font_size: 64.0,
+            color: Color::WHITE,
+        },
+    )
+    .with_alignment(subtitle.text_alignment)
 }
 
 pub fn opening(
     mut commands: Commands,
-    mut query: ParamSet<(
-        Query<(&mut Visibility, &mut Transform, &mut StartEntity01), With<StartEntity01>>,
-        Query<(&mut Visibility, &mut Transform, &mut StartEntity02), With<StartEntity02>>,
-        Query<(&mut Visibility, &mut Transform, &mut StartEntity03), With<StartEntity03>>,
-    )>,
+    mut anim_query: Query<(&mut Visibility, &mut Transform, &mut OpeningAnimation)>,
+    mut now_play_query: Query<&mut PlayingOpening>,
     time: Res<Time>,
     mut txt: Query<(&mut Text, &Subtitle), With<Subtitle>>,
     mut audio: EventWriter<SoundEvent>,
     assets: Res<AssetStorage>,
-){
-    debug!("start render");
+) {
+    trace!("opening");
+
+    let mut now_play = now_play_query.single_mut();
     let (mut txt, subtitle) = txt.single_mut();
+    for (mut vis, mut transform, mut anim) in anim_query.iter_mut() {
+        vis.is_visible = anim.index == now_play.0;
 
-    //start0
-    if !query.p0().single().2.timer.finished() {
-        query.p0().single_mut().2.timer.tick(time.delta());
-        query.p0().single_mut().1.scale.x += 0.001;
-        query.p0().single_mut().1.scale.y += 0.001;
+        if anim.index == now_play.0 {
+            if !anim.timer.finished() {
+                transform.scale.x += 0.001;
+                transform.scale.y += 0.001;
 
-        if !query.p0().single().2.played {
-            audio.send(SoundEvent::PlayAlbum(AlbumId::Opening));
-            //audio.send(SoundEvent::Sfx(SoundId::Start01Nar));
-            query.p0().single_mut().2.played = true;
-            change_txt(&mut txt, subtitle, "你是部落中的巫師\n你一直以來都認為自己的部落是最強大的\n".to_string());
-        }
-    }
-    else {
-        query.p0().single_mut().0.is_visible = false;
-        query.p1().single_mut().0.is_visible = true;
-
-        //start1
-        if !query.p1().single().2.timer.finished() {
-            query.p1().single_mut().2.timer.tick(time.delta());
-            query.p1().single_mut().1.scale.x += 0.001;
-            query.p1().single_mut().1.scale.y += 0.001;
-
-            if !query.p1().single().2.played {
-                //audio.send(SoundEvent::Sfx(SoundId::Start02Nar));
-                query.p1().single_mut().2.played = true;
-                change_txt(&mut txt, subtitle, "直到外來勢力的入侵打破了這個平衡\n這些入侵者帶來了疾病、屠殺和毀滅\n你感到非常絕望".to_string());
-            }
-        }
-        else {
-            query.p1().single_mut().0.is_visible = false;
-            query.p2().single_mut().0.is_visible = true;
-
-            //start2
-            if !query.p2().single().2.timer.finished() {
-                query.p2().single_mut().2.timer.tick(time.delta());
-                query.p2().single_mut().1.scale.x += 0.001;
-                query.p2().single_mut().1.scale.y += 0.001;
-
-                if !query.p2().single().2.played {
-                    //audio.send(SoundEvent::Sfx(SoundId::Start03Nar));
-                    query.p2().single_mut().2.played = true;
-                    change_white_txt(
-                        &mut txt, 
-                        subtitle, 
+                if !anim.played {
+                    if now_play.0 == 0 {
+                        audio.send(SoundEvent::PlayAlbum(AlbumId::Opening));
+                        audio.send(SoundEvent::Sfx(SoundId::Start01Nar));
+                        change_txt(
+                            &mut txt,
+                            subtitle,
+                            "你是部落中的巫師\n你一直以來都認為自己的部落是最強大的\n".to_string(),
+                        );
+                    } else if now_play.0 == 1 {
+                        audio.send(SoundEvent::Sfx(SoundId::Start02Nar));
+                        change_txt(&mut txt, subtitle, "直到外來勢力的入侵打破了這個平衡\n這些入侵者帶來了疾病、屠殺和毀滅\n你感到非常絕望".to_string());
+                    } else {
+                        audio.send(SoundEvent::Sfx(SoundId::Start03Nar));
+                        change_white_txt(
+                        &mut txt,
+                        subtitle,
                         "在你的絕望之中，你啟動了一個神秘的法術\n讓你連接到400年前的世界\n你可以帶著現代的東西回到過去\n並利用時間的力量去改變部落的命運".to_string(),
-                        assets
+                        &assets
                     );
+                    }
+                    anim.played = true;
                 }
             }
-            else {
-                info!("kill & change");
-    
-                query.p2().single_mut().0.is_visible = false;
-                audio.send(SoundEvent::KillAllMusic);
-                audio.send(SoundEvent::KillAllSoundEffects);
-                
-                commands.insert_resource(NextState(AppState::MainMenu));
+            if anim.timer.tick(time.delta()).just_finished() {
+                now_play.0 += 1;
             }
         }
-    }
 
+        if now_play.0 > 2 {
+            audio.send(SoundEvent::KillAllMusic);
+            audio.send(SoundEvent::KillAllSoundEffects);
+            commands.insert_resource(NextState(AppState::MainMenu));
+        }
+    }
 }

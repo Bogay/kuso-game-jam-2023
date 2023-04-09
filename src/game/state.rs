@@ -64,7 +64,6 @@ impl Plugin for GamePlugin {
                 AppState::InGame,
                 ConditionSet::new()
                     .run_in_state(AppState::InGame)
-                    .with_system(start_jazz_music)
                     .with_system(init_dungeon)
                     .with_system(create_initial_items)
                     //.with_system(test_slice)
@@ -122,10 +121,6 @@ impl Plugin for GamePlugin {
 pub enum GameResult {
     Lost,
     Won,
-}
-
-fn start_jazz_music(mut audio: EventWriter<SoundEvent>) {
-    audio.send(SoundEvent::PlayAlbum(AlbumId::Jazz));
 }
 
 pub fn despawn_gameplay_entities(
