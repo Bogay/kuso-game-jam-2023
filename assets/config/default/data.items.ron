@@ -718,7 +718,174 @@
                 damage_res: 3
             ),
             wearable: Shield
-        ))
-
+        )),
+       (((1, 1)), (
+            id: StoneTool,
+            name: "StoneTool",
+            description: "StoneTool",
+            texture_id: StoneTool,
+        )),
+        (((1, 1)), (
+            id: BronzeTool,
+            name: "BronzeTool",
+            description: "BronzeTool",
+            texture_id: BronzeTool,
+        )),
+        (((1, 1)), (
+            id: IronTool,
+            name: "IronTool",
+            description: "IronTool",
+            texture_id: IronTool,
+        )),
+        (((1, 1)), (
+            id: SteelTool,
+            name: "SteelTool",
+            description: "SteelTool",
+            texture_id: SteelTool,
+        )),
+        (((1, 1)), (
+            id: SteamPower,
+            name: "SteamPower",
+            description: "SteamPower",
+            texture_id: SteamPower,
+        )),
+        (((1, 1)), (
+            id: ElectronicTechnology,
+            name: "ElectronicTechnology",
+            description: "ElectronicTechnology",
+            texture_id: ElectronicTechnology,
+        )),
+        (((1, 1)), (
+            id: Religion,
+            name: "Religion",
+            description: "Religion",
+            texture_id: Religion,
+        )),
+        (((1, 1)), (
+            id: Chiefdom,
+            name: "Chiefdom",
+            description: "Chiefdom",
+            texture_id: Chiefdom,
+        )),
+        (((1, 1)), (
+            id: Feudal,
+            name: "Feudal",
+            description: "Feudal",
+            texture_id: Feudal,
+        )),
+        (((1, 1)), (
+            id: Centralization,
+            name: "Centralization",
+            description: "Centralization",
+            texture_id: Centralization,
+        )),
+        (((1, 1)), (
+            id: Democracy,
+            name: "Democracy",
+            description: "Democracy",
+            texture_id: Democracy,
+        )),
+        (((1, 1)), (
+            id: Theocracy,
+            name: "Theocracy",
+            description: "Theocracy",
+            texture_id: Theocracy,
+        )),
+        (((1, 1)), (
+            id: Monarchy,
+            name: "Monarchy",
+            description: "Monarchy",
+            texture_id: Monarchy,
+        )),
+        (((1, 1)), (
+            id: Empire,
+            name: "Empire",
+            description: "Empire",
+            texture_id: Empire,
+        )),
+        (((1, 1)), (
+            id: Totalitarian,
+            name: "Totalitarian",
+            description: "Totalitarian",
+            texture_id: Totalitarian,
+        )),
+        (((1, 1)), (
+            id: PermanentMember,
+            name: "PermanentMember",
+            description: "PermanentMember",
+            texture_id: PermanentMember,
+        )),
+        (((1, 1)), (
+            id: Wheat,
+            name: "Wheat",
+            description: "Wheat",
+            texture_id: Wheat,
+        )),
+        (((1, 1)), (
+            id: Alcohol,
+            name: "Alcohol",
+            description: "Alcohol",
+            texture_id: Alcohol,
+        )),
+        (((1, 1)), (
+            id: Meat,
+            name: "Meat",
+            description: "Meat",
+            texture_id: Meat,
+        )),
+        (((1, 1)), (
+            id: Fish,
+            name: "Fish",
+            description: "Fish",
+            texture_id: Fish,
+        )),
+        (((1, 1)), (
+            id: GatheringAndHunting,
+            name: "GatheringAndHunting",
+            description: "GatheringAndHunting",
+            texture_id: GatheringAndHunting,
+        )),
+        (((1, 1)), (
+            id: Fishery,
+            name: "Fishery",
+            description: "Fishery",
+            texture_id: Fishery,
+        )),
+        (((1, 1)), (
+            id: Writing,
+            name: "Writing",
+            description: "Writing",
+            texture_id: Writing,
+        )),
+        (((1, 1)), (
+            id: Book,
+            name: "Book",
+            description: "Book",
+            texture_id: Book,
+        )),
+        (((1, 1)), (
+            id: Printing,
+            name: "Printing",
+            description: "Printing",
+            texture_id: Printing,
+        )),
+        (((1, 1)), (
+            id: Currency,
+            name: "Currency",
+            description: "Currency",
+            texture_id: Currency,
+        )),
+        (((1, 1)), (
+            id: Trading,
+            name: "Trading",
+            description: "Trading",
+            texture_id: Trading,
+        )),
+        (((1, 1)), (
+            id: Industrialization,
+            name: "Industrialization",
+            description: "Industrialization",
+            texture_id: Industrialization,
+        )),
     ]
 )
