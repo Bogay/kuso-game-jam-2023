@@ -93,6 +93,34 @@ pub fn prepare_loading_config() -> LoadingConfig {
     c.textures.insert(Shield, "Shield.png".to_string());
     c.textures
         .insert(ShieldMasterwork, "ShieldMasterwork.png".to_string());
+    c.textures.insert(StoneTool, "StoneTool.png".to_string());
+    c.textures.insert(BronzeTool, "BronzeTool.png".to_string());
+    c.textures.insert(IronTool, "IronTool.png".to_string());
+    c.textures.insert(SteelTool, "SteelTool.png".to_string());
+    c.textures.insert(SteamPower, "SteamPower.png".to_string());
+    c.textures.insert(ElectronicTechnology, "ElectronicTechnology.png".to_string());
+    c.textures.insert(Religion, "Religion.png".to_string());
+    c.textures.insert(Chiefdom, "Chiefdom.png".to_string());
+    c.textures.insert(Feudal, "Feudal.png".to_string());
+    c.textures.insert(Centralization, "Centralization.png".to_string());
+    c.textures.insert(Democracy, "Democracy.png".to_string());
+    c.textures.insert(Theocracy, "Theocracy.png".to_string());
+    c.textures.insert(Monarchy, "Monarchy.png".to_string());
+    c.textures.insert(Empire, "Empire.png".to_string());
+    c.textures.insert(Totalitarian, "Totalitarian.png".to_string());
+    c.textures.insert(PermanentMember, "PermanentMember.png".to_string());
+    c.textures.insert(Wheat, "Wheat.png".to_string());
+    c.textures.insert(Alcohol, "Alcohol.png".to_string());
+    c.textures.insert(Meat, "Meat.png".to_string());
+    c.textures.insert(Fish, "Fish.png".to_string());
+    c.textures.insert(GatheringAndHunting, "GatheringAndHunting.png".to_string());
+    c.textures.insert(Fishery, "Fishery.png".to_string());
+    c.textures.insert(Writing, "Writing.png".to_string());
+    c.textures.insert(Book, "Book.png".to_string());
+    c.textures.insert(Printing, "Printing.png".to_string());
+    c.textures.insert(Currency, "Currency.png".to_string());
+    c.textures.insert(Trading, "Trading.png".to_string());
+    c.textures.insert(Industrialization, "Industrialization.png".to_string());
 
     // ==============================================================
     // ================= SFX

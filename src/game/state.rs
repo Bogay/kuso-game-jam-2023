@@ -170,34 +170,10 @@ pub fn create_debug_items(mut spawn: EventWriter<SpawnItemEvent>, items_db: Res<
         item.1,
         Coords::new(Pos::new(4, 3), item.0),
     ));
-    item = items_db.try_get_item(ItemId::ScrollBasic8).unwrap();
+    item = items_db.try_get_item(ItemId::StoneTool).unwrap();
     spawn.send(SpawnItemEvent::without_anim(
         item.1,
         Coords::new(Pos::new(5, 3), item.0),
-    ));
-
-    item = items_db.try_get_item(ItemId::Vial).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(0, 0), item.0),
-    ));
-
-    item = items_db.try_get_item(ItemId::Vial).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(1, 0), item.0),
-    ));
-
-    item = items_db.try_get_item(ItemId::HerbRed).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(2, 0), item.0),
-    ));
-
-    item = items_db.try_get_item(ItemId::HerbGreen).unwrap();
-    spawn.send(SpawnItemEvent::without_anim(
-        item.1,
-        Coords::new(Pos::new(3, 1), item.0),
     ));
     // item = items_db
     //     .try_get_item(ItemId::MasterworkSwordOfSpeed)
