@@ -110,7 +110,7 @@ impl Plugin for GamePlugin {
             )
             .add_plugin(BackpackPlugin)
             .add_plugin(EvolutionPlugin)
-            .add_plugin(WinGamePlugin);
+            .add_plugin(WinGamePlugin)
             .add_plugin(SpawnItemPlugin);
     }
 }
