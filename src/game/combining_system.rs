@@ -12,7 +12,7 @@ use crate::positioning::{Coords, Dimens, GridData};
 use crate::states::AppState;
 
 use super::backpack::Backpack;
-use super::dungeon_sim::{ContinuePrompt, JumpTimepointEvent};
+use super::dungeon_sim::JumpTimepointEvent;
 use super::items::CraftItem;
 
 #[derive(Component)]
