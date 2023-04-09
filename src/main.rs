@@ -10,6 +10,7 @@ use bevy::DefaultPlugins;
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 use egui::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
+use opening::OpeningPlugin;
 
 use crate::audio::plugin::MyAudioPlugin;
 use crate::config::config_audio::{AudioConfig, AudioConfigLoader};
@@ -44,6 +45,7 @@ mod positioning;
 mod states;
 mod transition_state;
 mod window_event_handler;
+mod opening;
 
 /// Will be visible to the user as the name of the window and on the menu screen.
 pub const GAME_NAME: &str = "Bag Goblin";
@@ -70,6 +72,7 @@ fn main() {
         .add_plugin(MyAudioPlugin)
         .add_plugin(MousePlugin)
         .add_plugin(LoadingPlugin)
+        .add_plugin(OpeningPlugin)
         .add_plugin(MainMenuPlugin)
         .add_plugin(TransitionPlugin)
         .add_plugin(GamePlugin)

@@ -27,11 +27,10 @@ use crate::AppState;
 
 use super::backpack::BackpackPlugin;
 use super::combat::{Combatant, Enemy, Hero};
-use super::create_backpack::create_backpack_data;
 use super::dungeon_sim::JumpTimepointEvent;
 use super::{
-    consume_item, delete_item_system, update_health_bar, update_hero_stats_display, EvolutionEvent,
-    EvolutionPlugin, Eyes, Iris, WinGamePlugin
+    consume_item, delete_item_system, show_item_stack_count, update_health_bar,
+    update_hero_stats_display, EvolutionPlugin, Eyes, Iris, SpawnItemPlugin, WinGamePlugin
 };
 
 pub struct GamePlugin;
@@ -98,6 +97,7 @@ impl Plugin for GamePlugin {
                     .with_system(consume_item)
                     .with_system(delete_item_system)
                     .with_system(animate_falling_item)
+                    .with_system(show_item_stack_count)
                     .into(),
             )
             .add_exit_system_set(
@@ -111,6 +111,7 @@ impl Plugin for GamePlugin {
             .add_plugin(BackpackPlugin)
             .add_plugin(EvolutionPlugin)
             .add_plugin(WinGamePlugin);
+            .add_plugin(SpawnItemPlugin);
     }
 }
 
