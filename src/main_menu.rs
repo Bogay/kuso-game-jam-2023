@@ -5,7 +5,7 @@ use iyes_loopless::state::NextState;
 
 use crate::audio::sound_event::SoundEvent;
 use crate::config::data_layout::LayoutData;
-use crate::game::create_backpack::create_layout_background;
+use crate::game::create_widget_backpack::create_layout_background;
 use crate::game::create_widget_feed::create_layout_feed;
 use crate::game::create_widget_grids::{create_layout_combine_button, create_layout_grids};
 use crate::game::create_widget_hero::create_layout_hero;
@@ -30,7 +30,7 @@ impl Plugin for MainMenuPlugin {
                     .with_system(delete_all_entities)
                     .with_system(create_camera)
                     .with_system(create_layout_background)
-                    /* 
+                    /*
                     .with_system(create_layout_music)
                     */
                     .with_system(create_layout_feed)
@@ -160,7 +160,6 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
         )),
         ..default()
     });
-
 }
 
 pub fn clean_menu_entities(mut commands: Commands, query: Query<Entity, With<MenuEntity>>) {

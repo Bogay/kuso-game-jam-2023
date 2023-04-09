@@ -1,12 +1,11 @@
 use crate::config::data_enemies::EnemiesData;
 use crate::game::combat::{DropTable, Enemy, EnemyId};
 use crate::game::dungeon_components::TextType;
-use crate::game::sim::dungeon_components::{DungeonLevel, Room};
+use crate::game::sim::dungeon_components::Room;
 use bevy::prelude::*;
-use rand::rngs::ThreadRng;
-use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::hash::Hash;
 
 use super::dungeon_components::{TimePoint, TimePointLevel};
 
@@ -51,116 +50,16 @@ fn gen_timepoint(time: i32) -> TimePoint {
 }
 
 pub fn generate_level(mut _cmd: &mut Commands) -> TimePointLevel {
-    let mut timepoints = Vec::<TimePoint>::new();
-    let t = gen_timepoint(TIMEPOINT_ANCIENT);
-    timepoints.push(t);
-    let t = gen_timepoint(TIMEPOINT_NOW);
-    timepoints.push(t);
+    let timepoints = vec![
+        gen_timepoint(TIMEPOINT_ANCIENT),
+        gen_timepoint(TIMEPOINT_NOW),
+    ];
 
     TimePointLevel {
         // TODO: does this always == timepoints.len()?
         timenum: 2,
         timepoints,
     }
-}
-
-// pub fn generate_level(
-//     blueprint: &LevelBlueprint,
-//     mut _cmd: &mut Commands,
-//     enemies_data: &Res<EnemiesData>,
-// ) -> DungeonLevel {
-//     let mut rooms = Vec::<Room>::new();
-//     let mut enemies = Vec::<Enemy>::new();
-//     let mut loot = Vec::<DropTable>::new();
-//     let mut rng = rand::thread_rng();
-
-//     for segment in &blueprint.segments {
-//         let room_type = choose_room_type(&segment.types, &mut rng);
-//         match room_type {
-//             RoomType::Empty => {
-//                 let mut r = generate_empty();
-//                 if let Some(flavour) = segment.custom_flavour.clone() {
-//                     r.flavour = Option::<TextType>::from(flavour);
-//                 }
-//                 rooms.push(r);
-//                 enemies.push(Enemy::default());
-//                 if let Some(custom) = &segment.custom_loot {
-//                     let clone = custom.clone();
-//                     loot.push(clone);
-//                 } else {
-//                     info!("Pushing default loot to an empty room.");
-//                     loot.push(blueprint.default_loot.clone());
-//                 }
-//             }
-//             RoomType::Fight => {
-//                 if let Some(enemy_opts) = &segment.enemies {
-//                     enemies.push(get_enemy(
-//                         &enemies_data,
-//                         choose_monster_type(&enemy_opts, &mut rng),
-//                     ));
-//                 } else {
-//                     error!("Room type is >Fight<, but there's no enemy list supplied!");
-//                     enemies.push(Enemy::default());
-//                 }
-//                 rooms.push(generate_fight());
-//                 loot.push(blueprint.default_loot.clone())
-//             }
-//             RoomType::Corridor => {
-//                 rooms.push(generate_corridor());
-//                 enemies.push(Enemy::default());
-//                 loot.push(blueprint.default_loot.clone())
-//             }
-//             RoomType::Start => {
-//                 rooms.push(generate_first_room());
-//                 enemies.push(Enemy::default());
-//                 loot.push(blueprint.default_loot.clone())
-//             }
-//             RoomType::End => {
-//                 rooms.push(generate_last_room());
-//                 enemies.push(Enemy::default());
-//                 loot.push(blueprint.default_loot.clone())
-//             }
-//         }
-//     }
-
-//     info!("Dungeon generation results: ");
-//     for s in 0..rooms.len() {
-//         rooms[s].print_diag_name();
-//     }
-//     info!("New depth: {}", &blueprint.depth);
-
-//     DungeonLevel {
-//         depth: blueprint.depth.clone(),
-//         rooms,
-//         enemies,
-//         loot,
-//     }
-// }
-
-// The choose_x_type methods should be remade to use generics
-// I don't understand rust's generics enough - Festus
-fn choose_room_type(input: &HashMap<RoomType, u32>, rng: &mut ThreadRng) -> RoomType {
-    let roll = rng.gen_range(1..=100);
-    let mut tracked_total_perc: u32 = 0;
-    for key in input.keys().clone() {
-        tracked_total_perc += input.get(key).unwrap();
-        if roll <= tracked_total_perc {
-            return key.clone();
-        }
-    }
-    return RoomType::default();
-}
-
-fn choose_monster_type(input: &HashMap<EnemyId, u32>, rng: &mut ThreadRng) -> EnemyId {
-    let roll = rng.gen_range(1..=100);
-    let mut tracked_total_perc = 0;
-    for key in input.keys().clone() {
-        tracked_total_perc += input.get(key).unwrap();
-        if roll <= tracked_total_perc {
-            return key.clone();
-        }
-    }
-    return EnemyId::default();
 }
 
 fn generate_first_room() -> Room {

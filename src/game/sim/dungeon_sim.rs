@@ -2,7 +2,7 @@ use super::dungeon_components::TimePointLevel;
 use crate::config::config_sim::SimConfig;
 use crate::config::data_blueprint::BlueprintData;
 use crate::config::data_enemies::EnemiesData;
-use crate::game::backpack::BackpackInUse;
+use crate::game::backpack::{BackpackInUse, SwitchBackpackEvent};
 use crate::game::combat::{DropTable, EnemyId};
 use crate::game::event_handling::SimMessageEvent;
 use crate::game::sim::combat::{process_combat, CombatState, Enemy, Hero};
@@ -55,12 +55,10 @@ pub fn init_dungeon(
 
 pub fn sync_backpack_in_use(
     mut er_jump: EventReader<JumpTimepointEvent>,
-    mut backpack_in_use: Query<&mut BackpackInUse>,
+    mut ew_switch: EventWriter<SwitchBackpackEvent>,
 ) {
     for JumpTimepointEvent { to, .. } in er_jump.iter() {
-        for mut b in backpack_in_use.iter_mut() {
-            b.0 = *to;
-        }
+        ew_switch.send(SwitchBackpackEvent(*to));
     }
 }
 

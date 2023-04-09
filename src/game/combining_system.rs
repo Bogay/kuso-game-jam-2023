@@ -128,7 +128,7 @@ fn count_by_id<'a>(items: impl IntoIterator<Item = &'a &'a Item>, id: ItemId) ->
 }
 
 fn contains<'a>(items: impl IntoIterator<Item = &'a &'a Item>, id: ItemId) -> bool {
-    items.into_iter().find(|it| it.id == id).is_some()
+    items.into_iter().any(|it| it.id == id)
 }
 
 fn increase_or_unlock(original: usize, add: usize, unlock: bool) -> usize {
@@ -312,11 +312,10 @@ where
         increase_or_unlock(
             count_by_id(items, ItemId::Empire),
             0,
-            (count_by_id(items, ItemId::Monarchy) > 1
+            count_by_id(items, ItemId::Monarchy) > 1
                 && count_by_id(items, ItemId::Centralization) > 0
                 && count_by_id(items, ItemId::Book) > 0
-                && population > 2000)
-                || population == 500,
+                && population > 2000,
         ),
     ));
     v.push((

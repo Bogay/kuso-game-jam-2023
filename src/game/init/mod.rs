@@ -1,4 +1,4 @@
-pub mod create_backpack;
+pub mod create_widget_backpack;
 pub mod create_widget_feed;
 pub mod create_widget_grids;
 pub mod create_widget_hero;
