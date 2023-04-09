@@ -30,6 +30,13 @@ fn draw_game_over_screen(
     let win_wi = window.width();
     let height = 220.0;
 
+    let mut fonts = egui::FontDefinitions::default();
+    fonts.font_data.insert("my_font".to_owned(), egui::FontData::from_static(include_bytes!("../assets/fonts/MSBold.ttf")));
+    fonts.families.entry(egui::FontFamily::Proportional).or_default().insert(0, "my_font".to_owned());
+    fonts.families.entry(egui::FontFamily::Monospace).or_default().push("my_font".to_owned());
+    egui_context.ctx_mut().set_fonts(fonts);
+    
+
     CentralPanel::default()
         .frame(Frame::none())
         .show(egui_context.ctx_mut(), |ui| {
@@ -48,8 +55,8 @@ fn draw_game_over_screen(
                 rect.center_top() + vec2(0.0, height / 2.0),
                 Align2::CENTER_CENTER,
                 match *result.current() {
-                    GameResult::Won => "The Ogre Necromancer is dead! You win!",
-                    GameResult::Lost => "You lost! Keep Sir Hoardalot alive!",
+                    GameResult::Won => "你救了我們\n我們會永遠感謝您",
+                    GameResult::Lost => "部落被毀滅了\n去睡大安森林公園",
                 },
                 FontId::proportional(46.0),
                 text_col,
