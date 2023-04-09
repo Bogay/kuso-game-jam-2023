@@ -62,6 +62,12 @@ pub fn load_assets(
         }
     }
 
+
+    storage.put_music(
+        AlbumId::Opening,
+        assets.load("audio/music/opening/OP.ogg"),
+        "OP".to_string(),
+    );
     storage.put_music(
         AlbumId::Ominous,
         assets.load("audio/music/ominous/main_menu_theme.ogg"),
