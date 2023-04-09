@@ -138,7 +138,7 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
     let screen_center = layout.screen_dimens * 0.5;
     let screen_anchor = screen_center - menu_screen_dimens * 0.5;
     let title_text_style = TextStyle {
-        font: assets.font(&FontId::FiraSansBold),
+        font: assets.font(&FontId::MSBold),
         font_size: 250.0,
         color: Color::ANTIQUE_WHITE,
     };
