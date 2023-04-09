@@ -100,46 +100,32 @@ pub fn tick_dungeon(
     input: Res<Input<KeyCode>>,
     mut cmd: Commands,
     mut victory: ResMut<State<GameResult>>,
-    mut jump: EventWriter<JumpTimepointEvent>,
+    mut er_jump: EventReader<JumpTimepointEvent>,
 ) {
-    let mut just_resumed = false;
-    if !state.running {
-        if input.just_pressed(KeyCode::Space) && state.combat_state != CombatState::HeroDead {
-            state.running = true;
-            just_resumed = true;
-        } else {
-            return;
-        }
-    }
-    if state.msg_cooldown.tick(time.delta()).just_finished() || just_resumed {
-        if just_resumed {
-            state.msg_cooldown.reset();
-        }
-        if (state.cur_timepoint_idx == 0) {
+    for evt in er_jump.iter() {
+        if evt.to == 0 {
             state.round += 1;
         }
-        let cur_timepoint_idx = state.cur_timepoint_idx;
-        state.cur_timepoint_idx = 1 - cur_timepoint_idx;
-        let level = state.current_level.as_ref().unwrap();
-        jump.send(JumpTimepointEvent {
-            from: level.timepoints[cur_timepoint_idx as usize].timepoint as usize,
-            to: level.timepoints[state.cur_timepoint_idx as usize].timepoint as usize,
-        });
 
-        if (state.round > 10)
-        {
+        // let cur_timepoint_idx = state.cur_timepoint_idx;
+        // state.cur_timepoint_idx = 1 - cur_timepoint_idx;
+        // let level = state.current_level.as_ref().unwrap();
+        // let from = level.timepoints[cur_timepoint_idx as usize].timepoint as usize;
+        // let to = level.timepoints[state.cur_timepoint_idx as usize].timepoint as usize;
+        // jump.send(JumpTimepointEvent { from, to });
+
+        if state.round > 10 {
             if victory.current().clone() == GameResult::Won {
                 victory.set(GameResult::Lost).unwrap();
             }
             info!("Dungeon complete!");
             cmd.insert_resource(NextState(AppState::GameEnded));
-            halt_dungeon_sim(state);
+            halt_dungeon_sim(&mut state);
             return;
         }
 
-        info!("{}", level.timepoints[state.cur_timepoint_idx as usize]);
-        halt_dungeon_sim(state);
-
+        // info!("{}", level.timepoints[state.cur_timepoint_idx as usize]);
+        halt_dungeon_sim(&mut state);
     }
 }
 
@@ -311,7 +297,7 @@ pub fn tick_dungeon(
 //     }
 // }
 
-pub fn halt_dungeon_sim(mut state: ResMut<DungeonState>) {
+pub fn halt_dungeon_sim(state: &mut DungeonState) {
     info!("Halting dungeon sim.");
     state.running = false;
 }
