@@ -30,14 +30,16 @@ impl Plugin for MainMenuPlugin {
                     .with_system(delete_all_entities)
                     .with_system(create_camera)
                     .with_system(create_layout_background)
+                    /* 
                     .with_system(create_layout_music)
+                    */
                     .with_system(create_layout_feed)
                     .with_system(create_layout_grids)
                     .with_system(create_layout_toasts)
                     .with_system(create_layout_combine_button)
-                    .with_system(create_layout_hero)
-                    .with_system(init_menu)
-                    .with_system(play_menu_music.run_if(should_play_music_right_away))
+                    //.with_system(create_layout_hero) /* state gui */
+                    .with_system(init_menu) /* change this if need to modify background title */
+                    //.with_system(play_menu_music.run_if(should_play_music_right_away))
                     .into(),
             )
             .add_system_set(
@@ -46,7 +48,7 @@ impl Plugin for MainMenuPlugin {
                     .with_system(check_menu_bypass.run_if(should_check_bypass))
                     .with_system(check_fullscreen.run_if(should_check_fullscreen))
                     .with_system(track_backpack_hover)
-                    .with_system(music_countdown_finished)
+                    //.with_system(music_countdown_finished)
                     .into(),
             )
             .add_exit_system_set(
@@ -138,23 +140,14 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
         font_size: 250.0,
         color: Color::ANTIQUE_WHITE,
     };
-    let props_text_style = TextStyle {
-        font: assets.font(&FontId::FiraSansBold),
-        font_size: 75.0,
-        color: Color::ANTIQUE_WHITE,
-    };
 
     let text_alignment = TextAlignment {
         horizontal: HorizontalAlign::Center,
         vertical: VerticalAlign::Center,
     };
 
-    let dev_props = "A Game by: Jazarro FestusVanGeck Jacques parK-dev";
-    let art_props = "Art by: Jack Pettigrew (DarkDax) & InkeFaux";
-    let music_props = "Music by: Twitchywhalez";
-
     commands.spawn_bundle(Text2dBundle {
-        text: Text::from_section("Loot Goblin", title_text_style).with_alignment(text_alignment),
+        text: Text::from_section("GG", title_text_style).with_alignment(text_alignment),
         transform: Transform::from_translation(Vec3::new(
             screen_anchor.x + menu_screen_dimens.x * 0.2,
             screen_anchor.y + menu_screen_dimens.y * 0.8,
@@ -168,52 +161,6 @@ pub fn init_menu(mut commands: Commands, assets: Res<AssetStorage>, layout: Res<
         ..default()
     });
 
-    commands.spawn_bundle(Text2dBundle {
-        text: Text::from_section(dev_props, props_text_style.clone())
-            .with_alignment(text_alignment),
-        transform: Transform::from_translation(Vec3::new(
-            screen_anchor.x + menu_screen_dimens.x * 0.5,
-            screen_anchor.y + menu_screen_dimens.y * 0.2,
-            Depth::Menu.z() + 10.,
-        ))
-        .with_scale(Vec3::new(
-            MENU_ZOOM / layout.text_factor,
-            MENU_ZOOM / layout.text_factor,
-            1.,
-        )),
-        ..default()
-    });
-
-    commands.spawn_bundle(Text2dBundle {
-        text: Text::from_section(art_props, props_text_style.clone())
-            .with_alignment(text_alignment),
-        transform: Transform::from_translation(Vec3::new(
-            screen_anchor.x + menu_screen_dimens.x * 0.5,
-            screen_anchor.y + menu_screen_dimens.y * 0.15,
-            Depth::Menu.z() + 10.,
-        ))
-        .with_scale(Vec3::new(
-            MENU_ZOOM / layout.text_factor,
-            MENU_ZOOM / layout.text_factor,
-            1.,
-        )),
-        ..default()
-    });
-
-    commands.spawn_bundle(Text2dBundle {
-        text: Text::from_section(music_props, props_text_style).with_alignment(text_alignment),
-        transform: Transform::from_translation(Vec3::new(
-            screen_anchor.x + menu_screen_dimens.x * 0.5,
-            screen_anchor.y + menu_screen_dimens.y * 0.1,
-            Depth::Menu.z() + 10.,
-        ))
-        .with_scale(Vec3::new(
-            MENU_ZOOM / layout.text_factor,
-            MENU_ZOOM / layout.text_factor,
-            1.,
-        )),
-        ..default()
-    });
 }
 
 pub fn clean_menu_entities(mut commands: Commands, query: Query<Entity, With<MenuEntity>>) {

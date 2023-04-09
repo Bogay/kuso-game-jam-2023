@@ -185,5 +185,34 @@ pub fn prepare_loading_config() -> LoadingConfig {
         .insert(FiraSansBold, "FiraSans-Bold.ttf".to_string());
     c.fonts
         .insert(FiraSansItalic, "FiraSans-Italic.ttf".to_string());
+    c.fonts
+        .insert(NotoSansCJKtcVF, "NotoSansCJKtc-VF.ttf".to_string());
+    c.fonts
+        .insert(MSBold, "MSBold.ttf".to_string());
+    
+    // ==============================================================
+    // ================= GGJ assets
+    // ==============================================================
+
+    c.textures.insert(Start01, "start1.png".to_string());
+    c.textures.insert(Start02, "start2.png".to_string());
+    c.textures.insert(Start03, "start3.png".to_string());
+    
+    // ==============================================================
+    // ================= GGJ sfx assets
+    // ==============================================================
+
+    let mut vec = Vec::new();
+    vec.push("narration/start01.ogg".to_string());
+    c.sfx.insert(Start01Nar, vec);
+    
+    let mut vec = Vec::new();
+    vec.push("narration/start02.ogg".to_string());
+    c.sfx.insert(Start02Nar, vec);
+
+    let mut vec = Vec::new();
+    vec.push("narration/start03.ogg".to_string());
+    c.sfx.insert(Start03Nar, vec);
+    
     c
 }

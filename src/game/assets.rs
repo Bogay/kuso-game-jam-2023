@@ -223,6 +223,10 @@ pub enum TextureId {
     Axe,
     AxeMasterwork,
     CombineButton,
+    // KGJ start scence
+    Start01,
+    Start02,
+    Start03
 }
 
 impl Default for TextureId {
@@ -251,6 +255,10 @@ pub enum SoundId {
     CombineSmithing,
     /// Failing to combine.
     CombineCant,
+    // opening narrative
+    Start01Nar,
+    Start02Nar,
+    Start03Nar
 }
 
 /// Identifies a music track or album.
@@ -258,6 +266,7 @@ pub enum SoundId {
 pub enum AlbumId {
     Jazz,
     Ominous,
+    Opening
 }
 
 #[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
@@ -268,4 +277,6 @@ pub enum FontId {
     FiraSansMedium,
     FiraSansBold,
     FiraSansItalic,
+    NotoSansCJKtcVF,
+    MSBold
 }
