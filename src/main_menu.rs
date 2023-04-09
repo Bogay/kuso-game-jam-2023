@@ -9,6 +9,7 @@ use crate::game::create_widget_backpack::create_layout_background;
 use crate::game::create_widget_feed::create_layout_feed;
 use crate::game::create_widget_grids::{create_layout_combine_button, create_layout_grids};
 use crate::game::create_widget_hero::create_layout_hero;
+use crate::game::create_widget_instruction::create_layout_instruction;
 use crate::game::create_widget_music::create_layout_music;
 use crate::game::create_widget_toasts::create_layout_toasts;
 use crate::game::{create_camera, AlbumId, AssetStorage, FontId, MENU_ZOOM};
@@ -37,6 +38,7 @@ impl Plugin for MainMenuPlugin {
                     .with_system(create_layout_grids)
                     .with_system(create_layout_toasts)
                     .with_system(create_layout_combine_button)
+                    .with_system(create_layout_instruction)
                     //.with_system(create_layout_hero) /* state gui */
                     .with_system(init_menu) /* change this if need to modify background title */
                     //.with_system(play_menu_music.run_if(should_play_music_right_away))
